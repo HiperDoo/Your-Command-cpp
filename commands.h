@@ -258,7 +258,7 @@ void sendCmd(std::string& text) {
     std::vector<std::string> vecS;
     stream >> cmdName;
 
-    if (!commandMap.count(cmdName) > 0 || text.length() > 32) {
+    if (!commandMap.count(cmdName) > 0 || text.length() > 64) {
         std::cout << "ERROR::El comando ingresado no existe o es demaciado largo!\n";
         return;
     }
