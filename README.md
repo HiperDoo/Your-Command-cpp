@@ -26,13 +26,10 @@ El programa cuenta con 8 comandos de prueba (con capacidad de agregar cuantos co
   Ejemplos:
   
   say Hola a todos!
-  
     > User: Hola a todos!
     
   say3 2020 [Hola a todos!] 2021
-  
     > User2020: Hola a todos num: 2021
     
   sum 300 20 1
-  
     > Console: 300 + 20 + 1 = 321
