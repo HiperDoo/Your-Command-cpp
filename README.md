@@ -3,6 +3,7 @@
 Este proyecto tiene como finalidad ejecutar funciones con comandos ingresados por el usuario a tiempo de ejecucion...
 
 El programa cuenta con 8 comandos de prueba (con capacidad de agregar cuantos comandos quieras para implementarlo en tu proyecto):
+
   hello <= Imprime un hello world
   
   say "text" <= Imprime la cadena de texto que hayas escrito en "text"
@@ -18,6 +19,8 @@ El programa cuenta con 8 comandos de prueba (con capacidad de agregar cuantos co
   res #num #num <= Imprime la resta de 2 numeros
   
   exit <= Cierra el programa
+  
+  
   
   
   Ejemplos:
