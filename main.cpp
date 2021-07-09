@@ -58,6 +58,21 @@ int main() {
     add("sum", sum, 0);
     add("res", res, 0);
     add("exit", exit, 0);
+    
+    //Tests
+    const int num = 7;
+    std::string testComands[num] = {
+        "hello",
+        "say Hola a todos!",
+        "say2 2021 [Hola a todos!]",
+        "say3 2021 [Hola a todos!] 2022",
+        "say4 2021 [Hola a todos!] [Como estan?] 2022",
+        "sum 300 20 1",
+        "res 400.33 234.02"
+    };
+    for (int i = 0; i < num; i++) {
+        sendCmd(testComands[i]);
+    }
 
     std::string text;
     while (exitB) {
