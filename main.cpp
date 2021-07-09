@@ -9,19 +9,19 @@ void hello() {
 }
 
 void say(const std::string& text) {
-    std::cout << ">  User: " << text << '\n';
+    std::cout << "> User: " << text << '\n';
 }
 
 void say2(int a, const std::string& text) {
-    std::cout << ">  User" << a << ": " << text << '\n';
+    std::cout << "> User" << a << ": " << text << '\n';
 }
 
 void say3(int a, const std::string& text, int b) {
-    std::cout << ">  User" << a << ": " << text << " num: " << b << '\n';
+    std::cout << "> User" << a << ": " << text << " num: " << b << '\n';
 }
 
 void say4(int a, const std::string& b, const std::string& c, int d) {
-    std::cout << ">  User" << a << ": " << b << c << " num: " << d << '\n';
+    std::cout << "> User" << a << ": " << b << c << " num: " << d << '\n';
 }
 
 void sum(float a, float b, float c) {
@@ -58,7 +58,7 @@ int main() {
     add("sum", sum, 0);
     add("res", res, 0);
     add("exit", exit, 0);
-    
+
     //Tests
     const int num = 7;
     std::string testComands[num] = {
