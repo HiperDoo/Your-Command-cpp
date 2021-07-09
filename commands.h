@@ -11,12 +11,12 @@
 
 //============================== GLOBAL VARIABLES ==============================
 struct Funcs {
-    std::function<void(const std::vector<std::string>&)> A;
-    std::size_t B; //Number of args of the function
-    int C; //Type of function
+    std::function<void(const std::vector<std::string>&)> func;
+    std::size_t numArgs; //Number of args of the function
+    int funcType; //Type of function
 };
 std::map<std::string, struct Funcs> commandMap;
-bool tupleB = true;
+bool tupleBool = true;
 //==============================================================================
 
 
@@ -72,32 +72,32 @@ bool isNumber(std::string& str) {
 }
 
 template<typename T, typename U, typename... Args>
-std::tuple<T, U, Args...> a2t(const std::vector<std::string>& a, int pos);
+std::tuple<T, U, Args...> maketuple(const std::vector<std::string>& a, int pos);
 template<typename T>
-std::tuple<T> a2t(const std::vector<std::string>& a, int pos);
+std::tuple<T> maketuple(const std::vector<std::string>& a, int pos);
 
 template<typename... Ts>
-void order(const std::function<void(Ts...)>& func, const std::vector<std::string>& cmdArgs) {
+void orderArgs(const std::function<void(Ts...)>& func, const std::vector<std::string>& cmdArgs) {
     std::tuple<typename std::remove_reference<Ts>::type...> args =
-        a2t<typename std::remove_reference<Ts>::type...>(cmdArgs, 0);
+        maketuple<typename std::remove_reference<Ts>::type...>(cmdArgs, 0);
 
-    if (tupleB) {
+    if (tupleBool) {
         apply(func, args);
     } else {
-        tupleB = true;
+        tupleBool = true;
         std::cout << "ERROR::Se ingreso un parametro de tipo no numerico!\n";
     }
 }
 
 template<>
-void order<>(const std::function<void()>& func, const std::vector<std::string>& cmdArgs) {
+void orderArgs<>(const std::function<void()>& func, const std::vector<std::string>& cmdArgs) {
     (void)cmdArgs;
 
     func();
 }
 
 template<typename T, typename U, typename... Args>
-std::tuple<T, U, Args...> a2t(const std::vector<std::string>& a, int pos) {
+std::tuple<T, U, Args...> maketuple(const std::vector<std::string>& a, int pos) {
     std::string temp = a[pos];
     pos++;
     if (std::is_same_v<T, unsigned int> || std::is_same_v<T, int> || std::is_same_v<T, unsigned long int> ||
@@ -106,24 +106,24 @@ std::tuple<T, U, Args...> a2t(const std::vector<std::string>& a, int pos) {
         if (isNumber(temp)) {
             return std::tuple_cat(
                 std::make_tuple(ArgConvert<std::string, T>{}(temp)),
-                a2t<U, Args...>(a, pos)
+                maketuple<U, Args...>(a, pos)
             );
         } else {
-            tupleB = false;
+            tupleBool = false;
             return std::tuple_cat(
                 std::make_tuple(ArgConvert<std::string, T>{}("0")),
-                a2t<U, Args...>(a, pos)
+                maketuple<U, Args...>(a, pos)
             );
         }
     }
     return std::tuple_cat(
         std::make_tuple(ArgConvert<std::string, T>{}(temp)),
-        a2t<U, Args...>(a, pos)
+        maketuple<U, Args...>(a, pos)
     );
 }
 
 template<typename T>
-std::tuple<T> a2t(const std::vector<std::string>& a, int pos) {
+std::tuple<T> maketuple(const std::vector<std::string>& a, int pos) {
     std::string temp = a[pos];
     if (std::is_same_v<T, unsigned int> || std::is_same_v<T, int> || std::is_same_v<T, unsigned long int> ||
         std::is_same_v<T, long int> || std::is_same_v<T, unsigned long long int> || std::is_same_v<T, long long int> ||
@@ -131,7 +131,7 @@ std::tuple<T> a2t(const std::vector<std::string>& a, int pos) {
         if (isNumber(temp)) {
             return std::make_tuple(ArgConvert<std::string, T>{}(temp));
         } else {
-            tupleB = false;
+            tupleBool = false;
             return std::make_tuple(ArgConvert<std::string, T>{}("0"));
         }
     } else {
@@ -158,96 +158,96 @@ void add_next(const std::string& cmdName, const Func& func, const FuncParser& fu
 
 template<typename... FuncArgs>
 void add(const std::string& cmdName, void(*func)(FuncArgs...), int args) {
-    add_next(cmdName, func, order<FuncArgs...>, args);
+    add_next(cmdName, func, orderArgs<FuncArgs...>, args);
 }
 //=======================================================================
 
-void case0(const std::string& cmdName, const std::string& text, std::vector<std::string>& vecS, std::string& temp) {
+void funcType0(const std::string& cmdName, const std::string& text, std::vector<std::string>& vecS, std::string& temp) {
     std::size_t args_pos = std::min(cmdName.size() + 1, text.length());
 
-    if (commandMap[cmdName].B == 0) {
-        commandMap[cmdName].A(vecS);
+    if (commandMap[cmdName].numArgs == 0) {
+        commandMap[cmdName].func(vecS);
         return;
     }
 
-    int j = 0;
+    int iterPos = 0;
 
-    while (j < text.length()) {
+    while (iterPos < text.length()) {
         if (text[args_pos] == ' ') {
             std::cout << "ERROR\n";
             return;
         }
-        j = args_pos;
-        while (!std::isspace(text[j])) {
-            if (j < text.length()) {
-                j++;
+        iterPos = args_pos;
+        while (!std::isspace(text[iterPos])) {
+            if (iterPos < text.length()) {
+                iterPos++;
             } else {
                 break;
             }
         }
-        temp = text.substr(args_pos, j - args_pos);
+        temp = text.substr(args_pos, iterPos - args_pos);
         vecS.push_back(temp);
-        j++;
-        args_pos = j;
+        iterPos++;
+        args_pos = iterPos;
     }
 
-    if (vecS.size() != commandMap[cmdName].B) {
-        std::cout << "ERROR::Se ingresaron " << vecS.size() << " argumentos de " << commandMap[cmdName].B << "!\n";
+    if (vecS.size() != commandMap[cmdName].numArgs) {
+        std::cout << "ERROR::Se ingresaron " << vecS.size() << " argumentos de " << commandMap[cmdName].numArgs << "!\n";
         return;
     }
 
-    commandMap[cmdName].A(vecS);
+    commandMap[cmdName].func(vecS);
 }
 
-void case1(const std::string& cmdName, const std::string& text, std::vector<std::string>& vecS) {
+void funcType1(const std::string& cmdName, const std::string& text, std::vector<std::string>& vecS) {
     std::size_t args_pos = std::min(cmdName.size() + 1, text.length());
     std::size_t args_end = text.find_last_not_of(" \t\r\n");
     std::size_t args_len = std::max(args_pos, args_end) - args_pos + 1;
 
     vecS.push_back((cmdName.size() > 0) ? text.substr(args_pos, args_len) : "");
 
-    commandMap[cmdName].A(vecS);
+    commandMap[cmdName].func(vecS);
 }
 
-void case2(const std::string& cmdName, const std::string& text, std::vector<std::string>& vecS, std::string& temp) {
+void funcType2(const std::string& cmdName, const std::string& text, std::vector<std::string>& vecS, std::string& temp) {
     std::size_t args_pos = std::min(cmdName.size() + 1, text.length());
-    int j = 0;
+    int iterPos = 0;
 
-    while (j < text.length()) {
+    while (iterPos < text.length()) {
         if (text[args_pos] == ' ') {
             std::cout << "ERROR\n";
             return;
         }
-        j = args_pos;
+        iterPos = args_pos;
         if (text[args_pos] == '[') {
-            while (text[j] != ']') {
-                if (j < text.length()) {
-                    j++;
+            while (text[iterPos] != ']') {
+                if (iterPos < text.length()) {
+                    iterPos++;
                 } else {
                     std::cout << "ERROR::La cadena de texto debe de terminar con un ']'!\n";
                     return;
                 }
             }
-            j++;
-            temp = text.substr(args_pos, j - args_pos);
+            iterPos++;
+            temp = text.substr(args_pos, iterPos - args_pos);
             vecS.push_back(temp);
         } else {
-            while (j < text.length() && !std::isspace(text[j])) {
-                j++;
+            while (iterPos < text.length() && !std::isspace(text[iterPos])) {
+                iterPos++;
             }
-            temp = text.substr(args_pos, j - args_pos);
+            temp = text.substr(args_pos, iterPos - args_pos);
             vecS.push_back(temp);
         }
-        j++;
-        args_pos = j;
+        iterPos++;
+        args_pos = iterPos;
     }
 
-    if (vecS.size() != commandMap[cmdName].B) {
-        std::cout << "ERROR::Se ingresaron " << vecS.size() << " argumentos de " << commandMap[cmdName].B << "!\n";
+    if (vecS.size() != commandMap[cmdName].numArgs) {
+        std::cout << "ERROR::Se ingresaron " << vecS.size() << " argumentos de " << commandMap[cmdName].numArgs << "!\n";
         return;
     }
 
-    commandMap[cmdName].A(vecS);
+    commandMap[cmdName].func(vecS);
 }
 
 
@@ -263,17 +263,17 @@ void sendCmd(std::string& text) {
         return;
     }
 
-    switch (commandMap[cmdName].C) {
+    switch (commandMap[cmdName].funcType) {
         case 0:
-            case0(cmdName, text, vecS, temp);
+            funcType0(cmdName, text, vecS, temp);
             break;
 
         case 1:
-            case1(cmdName, text, vecS);
+            funcType1(cmdName, text, vecS);
             break;
 
         case 2:
-            case2(cmdName, text, vecS, temp);
+            funcType2(cmdName, text, vecS, temp);
             break;
     }
 }
